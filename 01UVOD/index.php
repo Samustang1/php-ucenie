@@ -1,3 +1,4 @@
 <?php
-echo "dobre rano curaci!";
+echo "dobre rano čuraci!";
 ?>
+
