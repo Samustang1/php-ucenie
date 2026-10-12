@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Portfólio — LÁSKE Automotive Photography</title>
+  <meta name="description" content="Výber automobilových záberov podľa kategórie — exteriér, interiér, detaily a nočná fotografia.">
+  <meta name="theme-color" content="#f2eee6">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Portfólio — LÁSKE Automotive Photography">
+  <meta property="og:description" content="Výber automobilových záberov podľa kategórie.">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1200&q=80">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap site-header__inner">
+      <a class="brand" href="index.html" aria-label="LÁSKE — domov">
+        <span class="brand__mark">LÁSKE<em>.</em></span>
+        <span class="brand__sub">Automotive Photography</span>
+      </a>
+      <nav class="nav" id="nav" aria-label="Hlavná navigácia">
+        <a class="nav__link" href="index.html">Domov</a>
+        <a class="nav__link is-active" href="portfolio.html">Portfólio</a>
+        <a class="nav__link" href="o-mne.html">O mne</a>
+        <a class="nav__link" href="sluzby.html">Služby</a>
+        <a class="nav__link" href="kontakt.html">Kontakt</a>
+        <a class="btn btn--line nav__cta" href="kontakt.html">Rezervovať</a>
+      </nav>
+      <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="nav" aria-label="Otvoriť menu">
+        <span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+
+    <header class="page-hero">
+      <div class="wrap reveal">
+        <p class="overline">Výber záberov</p>
+        <h1>Portfólio</h1>
+        <p class="lead">
+          Každé auto má svoj charakter. Pozri si výber záberov podľa kategórie —
+          od exteriéru až po detaily. Klikni na fotku a otvorí sa vo väčšom náhľade.
+        </p>
+      </div>
+    </header>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="filters reveal" role="tablist" aria-label="Filtrovať portfólio">
+          <button class="filter is-active" type="button" data-filter="all" role="tab" aria-selected="true">Všetko</button>
+          <button class="filter" type="button" data-filter="exterior" role="tab" aria-selected="false">Exteriér</button>
+          <button class="filter" type="button" data-filter="interior" role="tab" aria-selected="false">Interiér</button>
+          <button class="filter" type="button" data-filter="detail" role="tab" aria-selected="false">Detaily</button>
+          <button class="filter" type="button" data-filter="night" role="tab" aria-selected="false">Nočná</button>
+        </div>
+
+        <div class="works">
+          <figure class="work work--wide reveal" data-category="exterior">
+            <div class="work__img">
+              <img src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1600&q=80"
+                   alt="Muscle car na ceste" loading="lazy"
+                   onerror="this.onerror=null;this.src='https://picsum.photos/seed/auto3/1600/900';">
+            </div>
+            <figcaption><span class="work__cat">Exteriér</span><span class="work__name">Muscle car</span></figcaption>
+          </figure>
+
+          <figure class="work reveal" data-category="interior">
+            <div class="work__img">
+              <img src="https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&fit=crop&w=900&q=80"
+                   alt="Interiér automobilu, palubná doska" loading="lazy"
+                   onerror="this.onerror=null;this.src='https://picsum.photos/seed/auto2/900/1100';">
+            </div>
+            <figcaption><span class="work__cat">Interiér</span><span class="work__name">Palubná doska</span></figcaption>
+          </figure>
+
+          <figure class="work reveal" data-category="night">
+            <div class="work__img">
+              <img src="https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&w=900&q=80"
+                   alt="Auto v noci, mestské svetlá" loading="lazy"
+                   onerror="this.onerror=null;this.src='https://picsum.photos/seed/auto5/900/1100';">
+            </div>
+            <figcaption><span class="work__cat">Nočná</span><span class="work__name">Mesto po zotmení</span></figcaption>
+          </figure>
+
+          <figure class="work reveal" data-category="detail">
+            <div class="work__img">
+              <img src="https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=900&q=80"
+                   alt="Predná maska automobilu" loading="lazy"
+                   onerror="this.onerror=null;this.src='https://picsum.photos/seed/auto7/900/700';">
+            </div>
+            <figcaption><span class="work__cat">Detaily</span><span class="work__name">Predná maska</span></figcaption>
+          </figure>
+
+          <figure class="work reveal" data-category="interior">
+            <div class="work__img">
+              <img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=900&q=80"
+                   alt="Auto v hale / štúdiu" loading="lazy"
+                   onerror="this.onerror=null;this.src='https://picsum.photos/seed/auto9/900/700';">
+            </div>
+            <figcaption><span class="work__cat">Interiér</span><span class="work__name">V hale</span></figcaption>
+          </figure>
+
+          <figure class="work reveal" data-category="exterior">
+            <div class="work__img">
+              <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=80"
+                   alt="Športový automobil, exteriér" loading="lazy"
+                   onerror="this.onerror=null;this.src='https://picsum.photos/seed/auto1/900/1100';">
+            </div>
+            <figcaption><span class="work__cat">Exteriér</span><span class="work__name">Športový coupé</span></figcaption>
+          </figure>
+
+          <figure class="work reveal" data-category="night">
+            <div class="work__img">
+              <img src="https://images.unsplash.com/photo-1526726538690-5cbf956ae2fd?auto=format&fit=crop&w=900&q=80"
+                   alt="Zadné svetlá v noci" loading="lazy"
+                   onerror="this.onerror=null;this.src='https://picsum.photos/seed/auto10/900/700';">
+            </div>
+            <figcaption><span class="work__cat">Nočná</span><span class="work__name">Zadné svetlá</span></figcaption>
+          </figure>
+
+          <figure class="work reveal" data-category="exterior">
+            <div class="work__img">
+              <img src="https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=900&q=80"
+                   alt="Auto na ceste za pohybu" loading="lazy"
+                   onerror="this.onerror=null;this.src='https://picsum.photos/seed/auto12/900/700';">
+            </div>
+            <figcaption><span class="work__cat">Exteriér</span><span class="work__name">V pohybe</span></figcaption>
+          </figure>
+
+          <figure class="work reveal" data-category="detail">
+            <div class="work__img">
+              <img src="https://images.unsplash.com/photo-1552519507-da3b1529e4c6?auto=format&fit=crop&w=900&q=80"
+                   alt="Detail automobilu" loading="lazy"
+                   onerror="this.onerror=null;this.src='https://picsum.photos/seed/auto4/900/700';">
+            </div>
+            <figcaption><span class="work__cat">Detaily</span><span class="work__name">Detail karosérie</span></figcaption>
+          </figure>
+
+          <figure class="work reveal" data-category="interior">
+            <div class="work__img">
+              <img src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=900&q=80"
+                   alt="Interiér športového auta" loading="lazy"
+                   onerror="this.onerror=null;this.src='https://picsum.photos/seed/auto8/900/1100';">
+            </div>
+            <figcaption><span class="work__cat">Interiér</span><span class="work__name">Kokpit</span></figcaption>
+          </figure>
+
+          <figure class="work reveal" data-category="detail">
+            <div class="work__img">
+              <img src="https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?auto=format&fit=crop&w=900&q=80"
+                   alt="Detail veterána" loading="lazy"
+                   onerror="this.onerror=null;this.src='https://picsum.photos/seed/auto11/900/1100';">
+            </div>
+            <figcaption><span class="work__cat">Detaily</span><span class="work__name">Veterán</span></figcaption>
+          </figure>
+
+          <figure class="work reveal" data-category="exterior">
+            <div class="work__img">
+              <img src="https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=900&q=80"
+                   alt="Auto v pohybe na okruhu" loading="lazy"
+                   onerror="this.onerror=null;this.src='https://picsum.photos/seed/auto6/900/700';">
+            </div>
+            <figcaption><span class="work__cat">Exteriér</span><span class="work__name">Na okruhu</span></figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta">
+      <div class="wrap reveal">
+        <h2>Páči sa ti to? <em>Nafotíme tvoje auto.</em></h2>
+        <div class="hero__actions" style="margin-top:1.6rem">
+          <a class="btn btn--line" href="kontakt.html">Rezervovať termín</a>
+          <a class="btn btn--line" href="sluzby.html">Pozrieť služby</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- lightbox -->
+  <div class="lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-label="Zväčšený náhľad">
+    <button class="lightbox__close" id="lbClose" type="button" aria-label="Zavrieť">✕</button>
+    <button class="lightbox__nav lightbox__nav--prev" id="lbPrev" type="button" aria-label="Predchádzajúce">‹</button>
+    <img id="lbImg" src="" alt="">
+    <p class="lightbox__cap" id="lbCap"></p>
+    <button class="lightbox__nav lightbox__nav--next" id="lbNext" type="button" aria-label="Ďalšie">›</button>
+  </div>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="site-footer__grid">
+        <div>
+          <div class="site-footer__mark">LÁSKE<em>.</em></div>
+          <p class="muted" style="margin-top:1rem;max-width:34ch">
+            Automobilová fotografia — prirodzene, bez klišé. Fotím na Slovensku.
+          </p>
+        </div>
+        <div>
+          <h4>Navigácia</h4>
+          <ul>
+            <li><a href="index.html">Domov</a></li>
+            <li><a href="portfolio.html">Portfólio</a></li>
+            <li><a href="o-mne.html">O mne</a></li>
+            <li><a href="sluzby.html">Služby</a></li>
+            <li><a href="kontakt.html">Kontakt</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Kontakt</h4>
+          <ul>
+            <li><a href="mailto:cizsamko@gmail.com">cizsamko@gmail.com</a></li>
+            <li><a href="tel:+421000000000">+421 000 000 000</a></li>
+            <li><a href="https://www.instagram.com/" target="_blank" rel="noopener">Instagram</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="site-footer__bottom">
+        <span>© <span id="year">2026</span> LÁSKE — Automotive Photography</span>
+        <span>Slovensko · termín na dohodu</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/js/main.js" defer></script>
+</body>
+</html>

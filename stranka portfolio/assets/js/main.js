@@ -1,258 +1,188 @@
-/* ==========================================================================
-   LÁSKE Automotive Photography — main.js
-   Obsahuje: preloader, navigáciu, reveal animácie, počítadlá, filtrovanie
-   galérie, lightbox a odoslanie rezervačného formulára (AJAX + fallback).
-   ========================================================================== */
+/* =====================================================================
+   LÁSKE — Automotive Photography  ·  v2 "Editorial"
+   Vanilla JS: menu, reveal, filtre, lightbox, formulár (odoslanie e-mailu).
+   Formulár odosiela cez FormSubmit — príjemca dostane e-mail v schránke,
+   návštevník nikdy neopúšťa stránku (žiadny mailto klient).
+   ===================================================================== */
 (function () {
   'use strict';
 
+  var $ = function (sel, ctx) { return (ctx || document).querySelector(sel); };
+  var $$ = function (sel, ctx) { return Array.prototype.slice.call((ctx || document).querySelectorAll(sel)); };
   var doc = document;
-  var $ = function (sel, ctx) { return (ctx || doc).querySelector(sel); };
-  var $$ = function (sel, ctx) { return Array.prototype.slice.call((ctx || doc).querySelectorAll(sel)); };
 
-  /* ---------- 1. Preloader ---------- */
-  function initPreloader() {
-    var pre = $('#preloader');
-    if (!pre) return;
-    var hide = function () {
-      setTimeout(function () { pre.classList.add('is-hidden'); }, 250);
-    };
-    if (doc.readyState === 'complete') hide();
-    else window.addEventListener('load', hide);
-    // poistka, aby preloader nikdy nezostal visieť
-    setTimeout(hide, 4000);
-  }
-
-  /* ---------- 2. Header + mobilné menu ---------- */
-  function initHeader() {
-    var header = $('#header');
+  /* ---------- 1. Mobilné menu ---------- */
+  function initMenu() {
     var burger = $('#burger');
     var nav = $('#nav');
-
-    var onScroll = function () {
-      if (!header) return;
-      header.classList.toggle('is-scrolled', window.scrollY > 10);
-    };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-
     if (!burger || !nav) return;
 
-    var close = function () {
-      nav.classList.remove('is-open');
-      burger.classList.remove('is-open');
-      burger.setAttribute('aria-expanded', 'false');
-      burger.setAttribute('aria-label', 'Otvoriť menu');
-      doc.body.classList.remove('is-locked');
+    var setOpen = function (open) {
+      nav.classList.toggle('is-open', open);
+      burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+      burger.setAttribute('aria-label', open ? 'Zavrieť menu' : 'Otvoriť menu');
+      doc.body.style.overflow = open ? 'hidden' : '';
     };
 
     burger.addEventListener('click', function () {
-      var open = nav.classList.toggle('is-open');
-      burger.classList.toggle('is-open', open);
-      burger.setAttribute('aria-expanded', open ? 'true' : 'false');
-      burger.setAttribute('aria-label', open ? 'Zavrieť menu' : 'Otvoriť menu');
-      doc.body.classList.toggle('is-locked', open);
+      setOpen(!nav.classList.contains('is-open'));
     });
 
     $$('.nav__link, .nav__cta', nav).forEach(function (a) {
-      a.addEventListener('click', close);
+      a.addEventListener('click', function () { setOpen(false); });
     });
 
     doc.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') close();
+      if (e.key === 'Escape') setOpen(false);
     });
   }
 
-  /* ---------- 3. Aktívny odkaz podľa sekcie ---------- */
-  function initActiveNav() {
-    var links = $$('.nav__link');
-    var sections = links.map(function (l) {
-      var id = l.getAttribute('href');
-      return id && id.charAt(0) === '#' ? doc.querySelector(id) : null;
-    }).filter(Boolean);
-    if (!sections.length) return;
-
-    var setActive = function () {
-      var pos = window.scrollY + 140;
-      var current = sections[0];
-      sections.forEach(function (sec) { if (sec.offsetTop <= pos) current = sec; });
-      links.forEach(function (l) {
-        l.classList.toggle('is-active', l.getAttribute('href') === '#' + current.id);
-      });
-    };
-    setActive();
-    window.addEventListener('scroll', setActive, { passive: true });
-  }
-
-  /* ---------- 4. Reveal on scroll ---------- */
+  /* ---------- 2. Reveal on scroll ---------- */
   function initReveal() {
     var items = $$('.reveal');
     if (!items.length) return;
 
     if (!('IntersectionObserver' in window)) {
-      items.forEach(function (el) { el.classList.add('is-visible'); });
+      items.forEach(function (el) { el.classList.add('is-in'); });
       return;
     }
 
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('is-visible');
-        io.unobserve(entry.target);
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-in');
+          io.unobserve(entry.target);
+        }
       });
-    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
 
-    items.forEach(function (el, i) {
-      el.style.transitionDelay = (i % 4) * 70 + 'ms';
-      io.observe(el);
-    });
+    items.forEach(function (el) { io.observe(el); });
   }
 
-  /* ---------- 5. Počítadlá ---------- */
-  function initCounters() {
-    var counters = $$('[data-count]');
-    if (!counters.length) return;
-
-    var animate = function (el) {
-      var target = parseInt(el.getAttribute('data-count'), 10) || 0;
-      var start = null;
-      var dur = 1600;
-      var step = function (ts) {
-        if (!start) start = ts;
-        var p = Math.min((ts - start) / dur, 1);
-        el.textContent = Math.floor(p * target).toString();
-        if (p < 1) requestAnimationFrame(step);
-        else el.textContent = target.toString();
-      };
-      requestAnimationFrame(step);
-    };
-
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) { animate(entry.target); io.unobserve(entry.target); }
-      });
-    }, { threshold: 0.5 });
-    counters.forEach(function (c) { io.observe(c); });
-  }
-
-  /* ---------- 6. Filtrovanie galérie ---------- */
+  /* ---------- 3. Filtre portfólia ---------- */
   function initFilters() {
-    var filters = $$('.filter');
-    var items = $$('.gallery__item');
-    if (!filters.length || !items.length) return;
+    var filterBar = $('.filters');
+    if (!filterBar) return;
+    var items = $$('[data-category]');
 
-    filters.forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var filter = btn.getAttribute('data-filter');
-        filters.forEach(function (b) {
-          var active = b === btn;
-          b.classList.toggle('is-active', active);
-          b.setAttribute('aria-selected', active ? 'true' : 'false');
-        });
-        items.forEach(function (item) {
-          var show = filter === 'all' || item.getAttribute('data-category') === filter;
-          item.classList.toggle('is-hidden', !show);
-        });
+    filterBar.addEventListener('click', function (e) {
+      var btn = e.target.closest ? e.target.closest('.filter') : null;
+      if (!btn) return;
+      var value = btn.getAttribute('data-filter');
+
+      $$('.filter', filterBar).forEach(function (b) {
+        var active = b === btn;
+        b.classList.toggle('is-active', active);
+        b.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+
+      items.forEach(function (item) {
+        var show = value === 'all' || item.getAttribute('data-category') === value;
+        item.style.display = show ? '' : 'none';
       });
     });
   }
 
-  /* ---------- 7. Lightbox ---------- */
+  /* ---------- 4. Lightbox ---------- */
   function initLightbox() {
     var lb = $('#lightbox');
     if (!lb) return;
-    var img = $('#lbImage');
-    var cap = $('#lbCaption');
-    var btnPrev = $('#lbPrev');
-    var btnNext = $('#lbNext');
-    var btnClose = $('#lbClose');
+
+    var imgEl = $('#lbImg');
+    var capEl = $('#lbCap');
+    var figures = $$('[data-category]');
     var current = 0;
 
-    var items = function () {
-      return $$('.gallery__item').filter(function (i) { return !i.classList.contains('is-hidden'); });
+    var collect = function () {
+      return figures.filter(function (f) { return f.style.display !== 'none'; });
     };
 
-    var largeSrc = function (src) {
-      if (!src) return src;
-      if (src.indexOf('images.unsplash.com') !== -1) return src.replace(/w=\d+/, 'w=1600');
-      if (src.indexOf('picsum.photos') !== -1) return src.replace(/\/\d+\/\d+$/, '/1600/1000');
-      return src;
-    };
-
-    var show = function (index) {
-      var list = items();
+    var render = function (list, index) {
       if (!list.length) return;
       current = (index + list.length) % list.length;
-      var figure = list[current];
-      var image = figure.querySelector('img');
-      var cat = figure.querySelector('.gallery__cat');
-      var name = figure.querySelector('.gallery__name');
-      img.src = largeSrc(image.getAttribute('src'));
-      img.alt = image.getAttribute('alt') || '';
-      cap.textContent = [cat && cat.textContent, name && name.textContent].filter(Boolean).join(' · ');
+      var fig = list[current];
+      var img = $('img', fig);
+      imgEl.src = img.src;
+      imgEl.alt = img.alt || '';
+      if (capEl) {
+        var cat = $('.work__cat', fig);
+        var name = $('.work__name', fig);
+        capEl.textContent = [cat ? cat.textContent : '', name ? name.textContent : ''].join(' — ');
+      }
     };
 
-    var open = function (index) {
-      show(index);
+    var open = function (fig) {
+      var list = collect();
+      var idx = list.indexOf(fig);
+      render(list, idx < 0 ? 0 : idx);
       lb.classList.add('is-open');
       lb.setAttribute('aria-hidden', 'false');
-      doc.body.classList.add('is-locked');
+      doc.body.style.overflow = 'hidden';
     };
+
     var close = function () {
       lb.classList.remove('is-open');
       lb.setAttribute('aria-hidden', 'true');
-      doc.body.classList.remove('is-locked');
+      doc.body.style.overflow = '';
     };
 
-    $$('.gallery__item').forEach(function (figure) {
-      figure.addEventListener('click', function () { open(items().indexOf(figure)); });
-      figure.setAttribute('tabindex', '0');
-      figure.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(items().indexOf(figure)); }
+    figures.forEach(function (fig) {
+      fig.addEventListener('click', function () { open(fig); });
+      fig.setAttribute('tabindex', '0');
+      fig.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(fig); }
       });
     });
 
-    if (btnPrev) btnPrev.addEventListener('click', function () { show(current - 1); });
-    if (btnNext) btnNext.addEventListener('click', function () { show(current + 1); });
-    if (btnClose) btnClose.addEventListener('click', close);
+    var prev = $('#lbPrev'), next = $('#lbNext'), closeBtn = $('#lbClose');
+    if (prev) prev.addEventListener('click', function () { render(collect(), current - 1); });
+    if (next) next.addEventListener('click', function () { render(collect(), current + 1); });
+    if (closeBtn) closeBtn.addEventListener('click', close);
     lb.addEventListener('click', function (e) { if (e.target === lb) close(); });
-
     doc.addEventListener('keydown', function (e) {
       if (!lb.classList.contains('is-open')) return;
       if (e.key === 'Escape') close();
-      if (e.key === 'ArrowLeft') show(current - 1);
-      if (e.key === 'ArrowRight') show(current + 1);
+      if (e.key === 'ArrowLeft') render(collect(), current - 1);
+      if (e.key === 'ArrowRight') render(collect(), current + 1);
     });
   }
 
-  /* ---------- 8. Rezervačný formulár ---------- */
-  function initBookingForm() {
+  /* ---------- 5. Rezervačný formulár ---------- */
+  /*  Odosiela na FormSubmit — e-mail príde do schránky (cizsamko@gmail.com),
+      bez otvárania e-mailového klienta u návštevníka.
+      Ak by JS zlyhal, formulár sa odošle natívne cez atribút action. */
+  function initForm() {
     var form = $('#bookingForm');
     if (!form) return;
+
     var note = $('#formNote');
     var submitBtn = $('#submitBtn');
-
     var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    var ENDPOINT = 'https://formsubmit.co/ajax/cizsamko@gmail.com';
 
     var setError = function (name, message) {
       var field = form.querySelector('[name="' + name + '"]');
+      if (field) {
+        var fieldWrap = field.closest('.field');
+        if (fieldWrap) field.classList && field.closest('.field').classList.toggle('has-error', !!message);
+      }
       var slot = form.querySelector('[data-error-for="' + name + '"]');
-      var wrap = field ? field.closest('.field') : null;
-      if (wrap) wrap.classList.toggle('has-error', !!message);
       if (slot) slot.textContent = message || '';
     };
 
     var validate = function () {
       var data = new FormData(form);
-      var errors = {};
-      if (!(data.get('name') || '').trim()) errors.name = 'Prosím, vyplňte meno.';
-      if (!emailRe.test((data.get('email') || '').trim())) errors.email = 'Prosím, zadajte platný e-mail.';
-      if (!(data.get('message') || '').trim()) errors.message = 'Napíšte prosím krátku správu.';
-      if (!data.get('gdpr')) errors.gdpr = 'Potvrďte prosím súhlas so spracovaním údajov.';
-      Object.keys({ name: 1, email: 1, message: 1, gdpr: 1 }).forEach(function (k) {
-        setError(k, errors[k]);
-      });
-      return Object.keys(errors).length === 0;
+      var ok = true;
+      var name = (data.get('name') || '').trim();
+      var email = (data.get('email') || '').trim();
+      var message = (data.get('message') || '').trim();
+      var gdpr = data.get('gdpr');
+
+      if (name.length < 2) { setError('name', 'Prosím, vyplň meno.'); ok = false; } else setError('name', '');
+      if (!emailRe.test(email)) { setError('email', 'Zadaj platný e-mail.'); ok = false; } else setError('email', '');
+      if (message.length < 5) { setError('message', 'Napíš aspoň krátku správu.'); ok = false; } else setError('message', '');
+      if (!gdpr) { setError('gdpr', 'Potrebujeme tvoj súhlas.'); ok = false; } else setError('gdpr', '');
+      return ok;
     };
 
     var showNote = function (text, type) {
@@ -262,70 +192,58 @@
       if (type) note.classList.add('is-' + type);
     };
 
-    var mailtoFallback = function (data) {
-      var body = [
-        'Meno: ' + (data.get('name') || ''),
-        'E-mail: ' + (data.get('email') || ''),
-        'Telefón: ' + (data.get('phone') || ''),
-        'Vozidlo: ' + (data.get('car') || ''),
-        'Dátum: ' + (data.get('date') || ''),
-        'Čas: ' + (data.get('time') || ''),
-        'Lokalita: ' + (data.get('location') || ''),
-        'Služba: ' + (data.get('package') || ''),
-        '',
-        'Správa:',
-        (data.get('message') || '')
-      ].join('\n');
-      var url = 'mailto:cizsamko@gmail.com?subject=' +
-        encodeURIComponent('Rezervácia fotenia — ' + (data.get('name') || '')) +
-        '&body=' + encodeURIComponent(body);
-      window.location.href = url;
-    };
-
     form.addEventListener('submit', function (e) {
       e.preventDefault();
-      if (!validate()) {
-        showNote('Skontrolujte prosím označené polia.', 'error');
-        return;
-      }
+      if (!validate()) { showNote('Skontroluj označené polia.', 'error'); return; }
 
       var data = new FormData(form);
-      submitBtn.classList.add('is-loading');
+      var payload = {
+        name: data.get('name') || '',
+        email: data.get('email') || '',
+        phone: data.get('phone') || '',
+        car: data.get('car') || '',
+        datum: data.get('date') || '',
+        cas: data.get('time') || '',
+        lokalita: data.get('location') || '',
+        sluzba: data.get('package') || '',
+        sprava: data.get('message') || '',
+        _subject: 'Nová rezervácia fotenia — ' + (data.get('name') || ''),
+        _template: 'table',
+        _captcha: 'false',
+        _honey: data.get('_honey') || ''
+      };
+
+      if (submitBtn) submitBtn.classList.add('is-loading');
       showNote('Odosielam…', '');
 
-      // 1) skús PHP endpoint
-      fetch('api/booking.php', {
+      fetch(ENDPOINT, {
         method: 'POST',
-        body: data,
-        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload)
       })
-        .then(function (res) { return res.json().catch(function () { return { ok: res.ok }; }); })
-        .then(function (json) {
-          if (json && json.ok) {
+        .then(function (res) { return res.json(); })
+        .then(function (res) {
+          if (res && (res.success === 'true' || res.success === true)) {
             form.reset();
-            showNote('Ďakujeme! Vaša rezervácia bola odoslaná. Ozvem sa do 24 hodín.', 'success');
+            showNote('Ďakujem! Rezervácia dorazila — ozvem sa ti čo najskôr.', 'success');
           } else {
-            throw new Error((json && json.error) || 'Odoslanie zlyhalo.');
+            showNote((res && res.message) ? res.message : 'Odoslanie zlyhalo. Skús znova alebo napíš na cizsamko@gmail.com.', 'error');
           }
         })
         .catch(function () {
-          // 2) fallback pre statický hosting (bez PHP)
-          showNote('Server nie je dostupný — otváram e-mailového klienta s vyplnenými údajmi…', '');
-          mailtoFallback(data);
+          showNote('Nepodarilo sa odoslať. Skús znova alebo napíš na cizsamko@gmail.com.', 'error');
         })
-        .finally(function () {
-          submitBtn.classList.remove('is-loading');
-        });
+        .then(function () { if (submitBtn) submitBtn.classList.remove('is-loading'); });
     });
 
-    // okamžité čistenie chýb pri písaní
+    /* okamžité čistenie chýb pri písaní */
     form.addEventListener('input', function (e) {
       var name = e.target && e.target.getAttribute && e.target.getAttribute('name');
       if (name && form.querySelector('[data-error-for="' + name + '"]')) setError(name, '');
     });
   }
 
-  /* ---------- 9. Predvyplnenie balíka z kariet ---------- */
+  /* ---------- 5b. Predvyplnenie balíka z kariet ---------- */
   function initPackageShortcut() {
     var select = $('#package');
     if (!select) return;
@@ -339,32 +257,18 @@
     });
   }
 
-  /* ---------- 10. Back to top + rok ---------- */
-  function initMisc() {
-    var toTop = $('#toTop');
-    if (toTop) {
-      var toggle = function () { toTop.classList.toggle('is-visible', window.scrollY > 600); };
-      toggle();
-      window.addEventListener('scroll', toggle, { passive: true });
-      toTop.addEventListener('click', function () {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      });
-    }
-    var year = $('#year');
-    if (year) year.textContent = new Date().getFullYear();
+  /* ---------- 6. Rok ---------- */
+  function initYear() {
+    var y = $('#year');
+    if (y) y.textContent = new Date().getFullYear();
   }
 
-  /* ---------- Naštartovanie ---------- */
   doc.addEventListener('DOMContentLoaded', function () {
-    initPreloader();
-    initHeader();
-    initActiveNav();
+    initMenu();
     initReveal();
-    initCounters();
     initFilters();
     initLightbox();
-    initBookingForm();
-    initPackageShortcut();
-    initMisc();
+    initForm();
+    initYear();
   });
 })();
