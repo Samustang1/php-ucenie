@@ -1,16 +1,16 @@
-< !DOCTYPE html >
-< html lang="en" >
-< head >
-< meta charset="UTF-8" >
-< meta name="viewport" content="width=device-width, initial-scale=1.0" >
-< title >Document< /title >
-< /head >
-< body >
-< ?php
+<!DOCTYPE html >
+<html lang="en" >
+<head >
+<meta charset="UTF-8" >
+<meta name="viewport" content="width=device-width, initial-scale=1.0" >
+<title >Document< /title >
+</head >
+<body >
+<?php
 echo "< h1 >Tento web je zamerany na premenne< /h1 >";
 ? >
 
-< ?php
+<?php
 echo "< p > . 2+ 4 .< /p >";
 
 //Priradenie hodnoty do premennej
